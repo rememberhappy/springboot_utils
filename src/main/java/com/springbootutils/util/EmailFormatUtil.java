@@ -1,4 +1,4 @@
-package cc.wdcloud.wdn.user.util;
+package com.springbootutils.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

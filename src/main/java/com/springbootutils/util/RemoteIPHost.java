@@ -1,4 +1,4 @@
-package com.gateway.utils;
+package com.springbootutils.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;

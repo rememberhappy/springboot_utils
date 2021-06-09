@@ -1,6 +1,5 @@
 package com.springbootutils.util;
 
-import cc.wdcloud.base.Resp;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +11,7 @@ import java.net.URLEncoder;
 @Component
 public class FileDownUtils {
 
-    public Resp fileDown(HttpServletRequest request, HttpServletResponse response, String path, String fileName) throws UnsupportedEncodingException {
+    public void fileDown(HttpServletRequest request, HttpServletResponse response, String path, String fileName) throws UnsupportedEncodingException {
         ClassPathResource classPathResource = new ClassPathResource(path);
         // response.setHeader("content-type", "application/octet-stream");
         response.setContentType("application/octet-stream");
@@ -31,9 +30,9 @@ public class FileDownUtils {
             while ((len = bis.read(buffer)) != -1) {
                 os.write(buffer, 0, len);
             }
-            return Resp.success();
+//            return Resp.success();
         } catch (Exception e) {
-            return Resp.error();
+//            return Resp.error();
         } finally {
             if (bis != null) {
                 try {

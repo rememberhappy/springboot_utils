@@ -1,6 +1,10 @@
 package com.springbootutils.util;
 
+import org.apache.commons.lang3.StringUtils;
+import com.google.common.base.Preconditions;
+
 import java.security.MessageDigest;
+import java.util.Random;
 
 /**
  * @Author zhangdj

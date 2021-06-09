@@ -4,11 +4,20 @@ import org.apache.commons.lang3.StringUtils;
 
 public class DesensitizationUtils {
 
-    public static String getId(String id) {
-        if (StringUtils.isNotBlank(id)) {
-            return id.substring(0, 1).concat("****************").concat(id.substring(id.length()-1, id.length()));
+    /**
+     * 身份证号脱敏
+     *
+     * @param idCard 身份证号
+     * @return java.lang.String
+     * @Throws
+     * @Author zhangdj
+     * @date 2021/6/9 17:09
+     */
+    public static String getIdCard(String idCard) {
+        if (StringUtils.isNotBlank(idCard)) {
+            return idCard.substring(0, 1).concat("****************").concat(idCard.substring(idCard.length() - 1, idCard.length()));
         } else {
-            return id;
+            return idCard;
         }
     }
 }
