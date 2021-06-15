@@ -7,9 +7,10 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
+ * 手机号格式验证工具类，港澳台以及大陆手机号都可
+ *
  * @Author zhangdj
  * @Date 2021/5/15:16:56
- * @Description 手机号格式验证工具类，港澳台以及大陆手机号都可
  */
 public class PhoneFormatCheckUtils {
 

@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author daocers
- * @date 2020/11/13 10:07
+ * 树
  */
 @Service
 public class TreeService {
@@ -19,10 +18,12 @@ public class TreeService {
     /**
      * 使用平铺的树状节点处理
      *
-     * @param
-     * @return
-     * @author daocers
-     * @date 2020/11/13 10:38
+     * @param nodeFlatList
+     * @param withNodeDetail
+     * @return java.util.List<com.springbootutils.util.WDTreeNode>
+     * @Throws
+     * @Author zhangdj
+     * @date 2021/6/15 15:53
      */
     public List<WDTreeNode> getTree(List nodeFlatList, Boolean... withNodeDetail) {
         if (CollectionUtils.isEmpty(nodeFlatList)) {
@@ -45,10 +46,11 @@ public class TreeService {
     /**
      * 获取树状列表
      *
-     * @param
-     * @return
-     * @author daocers
-     * @date 2020/11/13 10:09
+     * @param list
+     * @return java.util.List<com.springbootutils.util.WDTreeNode>
+     * @Throws
+     * @Author zhangdj
+     * @date 2021/6/15 15:53
      */
     public List<WDTreeNode> getTree(List<WDTreeNode> list) {
         List<WDTreeNode> nodes = new ArrayList<>();
@@ -63,7 +65,6 @@ public class TreeService {
             BeanUtils.copyProperties(permission, dto);
             nodes.add(dto);
         }
-
         Map<Long, List<WDTreeNode>> info = new HashMap<>();
         List<WDTreeNode> rootList = new ArrayList<>();
         for (WDTreeNode dto : nodes) {
@@ -82,6 +83,16 @@ public class TreeService {
         return rootList;
     }
 
+    /**
+     * 递归处理树节点
+     *
+     * @param id
+     * @param info
+     * @return java.util.List<com.springbootutils.util.WDTreeNode>
+     * @Throws
+     * @Author zhangdj
+     * @date 2021/6/15 15:54
+     */
     private List<WDTreeNode> getChildren(Long id, Map<Long, List<WDTreeNode>> info) {
         List<WDTreeNode> children = info.get(id);
         if (CollectionUtils.isNotEmpty(children)) {
@@ -91,6 +102,4 @@ public class TreeService {
         }
         return children;
     }
-
-
 }

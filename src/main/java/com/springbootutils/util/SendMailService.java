@@ -12,9 +12,13 @@ import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * 邮件发送
+ */
 @Service
 public class SendMailService {
 
@@ -27,13 +31,29 @@ public class SendMailService {
 
     @Value("${spring.mail.username}")
     private String username;
-    public boolean send(String to, String subject, String template, Map<String, Object> param){
+
+    /**
+     * @param email    邮箱账号
+     * @param signName 标志名称
+     * @param subject  主体
+     * @param template 生产html文件的名称
+     * @param authCode 生成的验证码
+     * @return boolean
+     * @Throws
+     * @Author zhangdj
+     * @date 2021/6/15 16:05
+     */
+    public boolean send(String email, String signName, String subject, String template, String authCode) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("signName", signName);
+        param.put("authCode", authCode);
         Context context = new Context();
         Iterator<String> it = param.keySet().iterator();
         while (it.hasNext()) {
             String key = it.next();
             context.setVariable(key, param.get(key));
         }
+        // 使用thymeleaf模版来生产html文件。
         String emailContent = templateEngine.process(template, context);
 
         MimeMessage message = mailSender.createMimeMessage();
@@ -41,7 +61,7 @@ public class SendMailService {
         try {
             helper = new MimeMessageHelper(message, true, "utf-8");
             helper.setFrom(username);
-            helper.setTo(to);
+            helper.setTo(email);
             helper.setSubject(subject);
             helper.setText(emailContent, true);
         } catch (MessagingException e) {

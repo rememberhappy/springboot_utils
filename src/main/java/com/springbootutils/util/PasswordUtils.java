@@ -5,14 +5,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * 利用Random方法生产随机密码。
+ * 将字母，数字，符号拆开成可取用的数组，按照密码长度做生成策略， 分别为小写字母占密码长度的1/2，大写字母和数字各占1/4，符号占剩余无法除尽的（最多两个符号）。
+ * 然后循环取值，每一次从数组中随机拿取字符，并把这个字符随机放入生产的密码字符串中的某个位置。
+ */
 public class PasswordUtils {
 
     private static final String ALL_CHAR = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
- /*利用Random方法生产随机密码。
-    将字母，数字，符号拆开成可取用的数组，按照密码长度做生成策略， 分别为小写字母占密码长度的1/2，大写字母和数字各占1/4，符号占剩余无法除尽的（最多两个符号）。
-    然后循环取值，每一次从数组中随机拿取字符，并把这个字符随机放入生产的密码字符串中的某个位置。*/
-
 
     public final static String[] LOWER_CASES = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
     public final static String[] UPPER_CASES = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
@@ -30,11 +30,8 @@ public class PasswordUtils {
             return "";
         }
         int lower = pwd_len / 2;
-
         int upper = (pwd_len - lower) / 2;
-
         int num = pwd_len - lower - upper;
-
         StringBuffer pwd = new StringBuffer();
         Random random = new Random();
         while ((lower + upper + num) > 0) {
@@ -52,10 +49,7 @@ public class PasswordUtils {
             }
         }
         return pwd.toString();
-
     }
-
-
 
     public static String getPassword() {
         int length = 6 + Math.abs(new Random().nextInt(12));
@@ -72,5 +66,4 @@ public class PasswordUtils {
         }
         return buffer.toString();
     }
-
 }

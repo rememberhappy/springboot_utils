@@ -4,37 +4,44 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Pattern;
 
+/**
+ * 验证的类
+ */
 public class ValidateUtils {
     static Pattern postcode = Pattern.compile("^[1-9]\\d{5}$");
     static Pattern phone = Pattern.compile("^((13[0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$");
     static Pattern telephone = Pattern.compile("^[1-9]\\d{5}$");
     static Pattern idCard = Pattern.compile("^((13[0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$");
 
-    public static boolean isPhone(String info) {
-        if(StringUtils.isBlank(info)){
-            return false;
-        }
-        return phone.matcher(info).matches();
+    /**
+     * 是否手机号
+     * 大陆，港澳台
+     *
+     * @param phoneStr 手机号
+     * @return boolean
+     * @Throws
+     * @Author zhangdj
+     * @date 2021/6/15 16:16
+     */
+    public static boolean isPhone(String phoneStr) {
+        return PhoneFormatCheckUtils.isPhoneLegal(phoneStr);
     }
 
-    public static boolean isPostcode(String info){
-        if(StringUtils.isBlank(info)){
+    public static boolean isPostcode(String info) {
+        if (StringUtils.isBlank(info)) {
             return false;
         }
         return postcode.matcher(info).matches();
     }
 
-
     /**
-     *
-     *
      * @param
      * @return
      * @author daocers
      * @date 2020/11/23 18:19
      */
-    public static boolean isTelephone(String info){
-        if(StringUtils.isBlank(info)){
+    public static boolean isTelephone(String info) {
+        if (StringUtils.isBlank(info)) {
             return false;
         }
         return telephone.matcher(info).matches();
@@ -49,8 +56,8 @@ public class ValidateUtils {
      * @author daocers
      * @date 2020/11/23 18:19
      */
-    public static boolean isIdCard(String info){
-        if(StringUtils.isBlank(info)){
+    public static boolean isIdCard(String info) {
+        if (StringUtils.isBlank(info)) {
             return false;
         }
         return idCard.matcher(info).matches();
@@ -113,9 +120,5 @@ public class ValidateUtils {
         String reg = "(?:(\\(\\+?86\\))(0[0-9]{2,3}\\-?)?([2-9][0-9]{6,7})+(\\-[0-9]{1,4})?)|" +
                 "(?:(86-?)?(0[0-9]{2,3}\\-?)?([2-9][0-9]{6,7})+(\\-[0-9]{1,4})?)";
         return Pattern.matches(reg, fixedPhone);
-    }
-
-    public static void main(String[] args) throws Exception {
-        phone("010-61111521");
     }
 }

@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @Author zhangdj
  * @Date 2021/5/31:18:52
- * @Description
  */
 public class RemoteIPHost {
     /**
@@ -19,7 +18,6 @@ public class RemoteIPHost {
      *
      * @param request
      * @return java.lang.String
-     * @Throws
      * @Author zhangdj
      * @date 2021/5/17 17:38
      */
@@ -52,7 +50,6 @@ public class RemoteIPHost {
      *
      * @param request
      * @return java.lang.String
-     * @Throws
      * @Author zhangdj
      * @date 2021/5/31 18:58
      */

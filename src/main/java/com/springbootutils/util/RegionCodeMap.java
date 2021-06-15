@@ -3,6 +3,9 @@ package com.springbootutils.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 区域编码
+ */
 public class RegionCodeMap {
 
     private static final Map<String, String> regionMap = new HashMap<>();
