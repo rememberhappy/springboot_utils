@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
  * 18位身份证号，只展示前三位和后四位，中间11位隐藏；
  * 15位身份证号，只展示前三位和后四位，中间8位隐藏；
  * 身份证修改为只显示首位各一位，中间全部隐藏
+ *
  * @author daocers
  * @date 2020/12/16 17:31
  */
@@ -34,6 +35,7 @@ public class StarizeUtil {
         }
         return idCardNo;
     }
+
     /**
      * 身份证号脱敏【字符串】
      *
@@ -50,6 +52,7 @@ public class StarizeUtil {
             return idCard;
         }
     }
+
     /**
      * 手机号脱敏
      *

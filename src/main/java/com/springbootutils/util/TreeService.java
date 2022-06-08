@@ -29,7 +29,6 @@ public class TreeService {
         if (CollectionUtils.isEmpty(nodeFlatList)) {
             return new ArrayList<>();
         }
-
         List<WDTreeNode> nodes = new ArrayList<>();
         for (Object item : nodeFlatList) {
             WDTreeNode node = new WDTreeNode();
@@ -39,7 +38,6 @@ public class TreeService {
             }
             nodes.add(node);
         }
-
         return getTree(nodes);
     }
 

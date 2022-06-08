@@ -32,7 +32,7 @@ public class PasswordUtils {
         int lower = pwd_len / 2;
         int upper = (pwd_len - lower) / 2;
         int num = pwd_len - lower - upper;
-        StringBuffer pwd = new StringBuffer();
+        StringBuilder pwd = new StringBuilder();
         Random random = new Random();
         while ((lower + upper + num) > 0) {
             if (lower > 0) {
@@ -60,7 +60,7 @@ public class PasswordUtils {
             res.add(c + "");
         }
         Collections.shuffle(res);
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < length; i++) {
             buffer.append(res.get(i));
         }

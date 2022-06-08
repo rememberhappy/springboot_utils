@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.HashMap;
@@ -22,14 +23,15 @@ import java.util.Map;
 @Service
 public class SendMailService {
 
-    Logger logger = LoggerFactory.getLogger(SendMailService.class);
+    private final static Logger logger = LoggerFactory.getLogger(SendMailService.class);
 
     @Autowired
     private TemplateEngine templateEngine;
+    // 需要在配置文件中 配置模板信息。否则启动不了
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.username:asd}")
     private String username;
 
     /**

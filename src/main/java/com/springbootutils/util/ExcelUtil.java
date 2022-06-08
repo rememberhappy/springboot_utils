@@ -2,13 +2,14 @@ package com.springbootutils.util;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.usermodel.XSSFDataValidation;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
@@ -16,19 +17,21 @@ import org.thymeleaf.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by user on 2017/1/16.
  */
 public class ExcelUtil {
-    private static Logger logger = LoggerFactory.getLogger(ExcelUtil.class);
+
+    private final static Logger logger = LoggerFactory.getLogger(ExcelUtil.class);
+    private static final ThreadLocal<DateFormat> format = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     public static void main(String[] args) throws Exception {
         List<List<String>> data = getData(new File("d:/abc.xlsx"));
@@ -69,7 +72,7 @@ public class ExcelUtil {
     public static File getFile(String name, String type, String dirPath, List<String> title, Map<String, List<String>> validationInfo, List<List<String>> content) throws Exception {
         File file = new File(dirPath, name + "." + type);
         OutputStream fileOutputStream = new FileOutputStream(file);
-        fileOutputStream = writeToOutputStream(type, title, content, validationInfo, fileOutputStream);
+        writeToOutputStream(type, title, content, validationInfo, fileOutputStream);
         fileOutputStream.close();
         return file;
     }
@@ -118,28 +121,10 @@ public class ExcelUtil {
     private static Workbook writeToExcel(String type, List<String> title, List<List<String>> content, Map<String, List<String>> validationInfo) throws Exception {
 
         Workbook workbook = createExcel(type);
-
-//        /**
-//         * 对textStyle进行写，使用锁操作
-//         */
-//        ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
-//        writeLock.lock();
-//        try{
-//            if(textStyle == null){
-//                textStyle = (HSSFCellStyle) workbook.createCellStyle();
-//                DataFormat format = workbook.createDataFormat();
-//                textStyle.setDataFormat(format.getFormat("@"));
-//            }
-//        }finally {
-//            writeLock.unlock();
-//        }
-//
-
-
         Sheet sheet = createSheet(workbook, null);
         writeTitle(workbook, sheet, title, validationInfo);
         boolean hasTitle = false;
-        if (title != null && title.size() > 0) {
+        if (title.size() > 0) {
             hasTitle = true;
         }
         writeContent(workbook, sheet, content, hasTitle);
@@ -162,8 +147,8 @@ public class ExcelUtil {
         if (StringUtils.isEmpty(name)) {
             name = "第一页";
         }
-        Sheet sheet = workbook.createSheet();
-        return sheet;
+        workbook.setSheetName(0, name);
+        return workbook.createSheet();
     }
 
     /**
@@ -222,47 +207,42 @@ public class ExcelUtil {
      */
     private static void writeContent(Workbook workbook, Sheet sheet, List<List<String>> content, boolean hasTitle) {
         if (CollectionUtils.isNotEmpty(content)) {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
             CellStyle cellStyle = createCellStyle(workbook, false);
             for (int i = 0; i < content.size(); i++) {
-                List rowData = content.get(i);
-                Row row = null;
+                List<String> rowData = content.get(i);
+                Row row;
                 if (hasTitle) {
                     row = sheet.createRow(i + 1);
                 } else {
                     row = sheet.createRow(i);
                 }
                 for (int j = 0; j < rowData.size(); j++) {
-                    String res = "";
-                    Object val = rowData.get(j);
-                    if (val == null) {
-
-                    } else if (val instanceof String) {
-                        res = (String) val;
-                    } else if (val instanceof Date) {
-                        res = format.format((Date) val);
-                    } else if (val instanceof Integer) {
-                        res = val + "";
-                    } else if (val instanceof Double) {
-                        res = val + "";
-                    } else if (val instanceof Short) {
-                        res = val + "";
-                    } else if (val instanceof BigDecimal) {
-                        res = val + "";
+                    String res;
+                    Object columnData = rowData.get(j);
+                    if (columnData == null) {
+                        res = "";
+                    } else if (columnData instanceof String) {
+                        res = (String) columnData;
+                    } else if (columnData instanceof Date) {
+                        res = format.get().format((Date) columnData);
+                    } else if (columnData instanceof Integer) {
+                        res = columnData + "";
+                    } else if (columnData instanceof Double) {
+                        res = columnData + "";
+                    } else if (columnData instanceof Short) {
+                        res = columnData + "";
+                    } else if (columnData instanceof BigDecimal) {
+                        res = columnData + "";
                     } else {
-                        res = val.toString();
+                        res = columnData.toString();
                     }
-
                     Cell cell = row.createCell(j);
                     cell.setCellStyle(cellStyle);
                     cell.setCellValue(res);
                     cell.setCellType(CellType.STRING);
-
                 }
             }
         }
-
     }
 
     /**
@@ -291,7 +271,6 @@ public class ExcelUtil {
         return cellStyle;
     }
 
-
     /**
      * 从文件中读取excel数据
      *
@@ -314,24 +293,14 @@ public class ExcelUtil {
         }
     }
 
-    /**
-     * 从流中读取excel数据
-     *
-     * @param inputStream
-     * @return
-     * @throws IOException
-     * @throws InvalidFormatException
-     */
-
     /***
      * 从输入流中读取数据
-     * @Time 2017/11/26 10:00
      * @Author daocers
      * @param   inputStream 输入流
      * @param index excel 的sheet索引，从0开始，默认为0
      * @return java.util.List<java.util.List < java.lang.String>>
      */
-    public static List<List<String>> getData(InputStream inputStream, Integer... index) throws IOException, InvalidFormatException {
+    public static List<List<String>> getData(InputStream inputStream, Integer... index) throws IOException {
         Workbook workbook = WorkbookFactory.create(inputStream);
         Integer idx = 0;
         if (index != null && index.length > 0) {
@@ -344,7 +313,7 @@ public class ExcelUtil {
         }
     }
 
-    public static List<List<List<String>>> getDataAboutSheet(InputStream inputStream, Integer... index) throws IOException, InvalidFormatException {
+    public static List<List<List<String>>> getDataAboutSheet(InputStream inputStream) throws IOException {
         Workbook workbook = WorkbookFactory.create(inputStream);
         List<List<List<String>>> datas = new ArrayList<>();
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -369,51 +338,47 @@ public class ExcelUtil {
      * @return
      */
     private static List<List<String>> getData(Workbook workbook, Integer sheetIndex) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         if (sheetIndex == null) {
             sheetIndex = 0;
         }
         List<List<String>> res = new ArrayList<>();
         Sheet sheet = workbook.getSheetAt(sheetIndex);
-        logger.debug("当前sheet： {}， 有 {} 行", new Integer[]{sheetIndex, sheet.getLastRowNum()});
+        logger.debug("当前sheet： {}， 有 {} 行", sheetIndex, sheet.getLastRowNum());
         Integer cellCount = null;
-        //for (Row row : sheet) {
         for (int i = 0; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             List<String> rowData = new ArrayList<>();
             if (row == null) {
                 if (res.size() != 0) {
                     for (int j = 0; j < res.get(0).size(); j++) {
-                        rowData.add(null);
+                        rowData.add("");
                     }
                 }
                 res.add(rowData);
                 continue;
             }
             if (cellCount == null) {
-                cellCount = Integer.valueOf(row.getLastCellNum());
+                cellCount = (int) row.getLastCellNum();
             }
-            Integer rowIndex = row.getRowNum();
             for (int j = 0; j < cellCount; j++) {
                 Cell cell = row.getCell(j);
                 Integer rowNum = row.getRowNum();
-                logger.debug("当前row： {}， 有 {} 列", new Object[]{rowNum, row.getLastCellNum()});
+                logger.debug("当前row： {}， 有 {} 列", rowNum, row.getLastCellNum());
                 String data = "";
                 if (cell != null) {
                     switch (cell.getCellType()) {
                         case STRING:
-                            data = cell.getRichStringCellValue().getString();
+                            data = cell.getRichStringCellValue().getString().trim();
                             break;
                         case NUMERIC:
                             if (HSSFDateUtil.isCellDateFormatted(cell)) {
                                 Date date = HSSFDateUtil.getJavaDate(cell.getNumericCellValue());
-                                data = format.format(date);
+                                data = format.get().format(date);
                             } else {
                                 data = cell.getNumericCellValue() + "";
                                 if (data.contains(".") && data.contains("E")) {
                                     data = Double.valueOf(cell.getNumericCellValue()).longValue() + "";
                                 }
-                                System.out.println("data," + data);
                             }
                             break;
                         case BLANK:
@@ -429,13 +394,11 @@ public class ExcelUtil {
                             data = cell.getStringCellValue();
                     }
                 }
-
                 rowData.add(data);
             }
             res.add(rowData);
         }
         return res;
-
     }
 
 
@@ -459,7 +422,7 @@ public class ExcelUtil {
             fileName = URLEncoder.encode(fileName, "UTF-8");
             fileName = fileName.replace("+", "%20"); // 处理空格变“+”的问题
         } else { // 谷歌 火狐 360
-            fileName = new String(fileName.getBytes("UTF-8"), "ISO8859-1");
+            fileName = new String(fileName.getBytes(StandardCharsets.UTF_8), "ISO8859-1");
         }
         // 设置返回值头
         response.setContentType("application/octet-stream;");
@@ -471,4 +434,93 @@ public class ExcelUtil {
     }
 
 
+    /**
+     * 将对象集合转化为excel
+     *
+     * @param outputStream 要输出的流对象
+     * @param objects      数据集合
+     * @param type         数据类型
+     * @param columnNames  列名集合
+     * @param columns      要打印的列
+     */
+    public static final <T> void writeObjectsToExcel(OutputStream outputStream, List<T> objects, Class type,
+                                                     String[] columnNames, String... columns) throws NoSuchFieldException, IOException, IllegalAccessException {
+        // 创建excel
+        XSSFWorkbook wb = new XSSFWorkbook();
+        writeXSSWorkbookData(wb, objects, type, columnNames, columns);
+
+        // 将文件写入流
+        wb.write(outputStream);
+        // 关闭流
+        outputStream.flush();
+        outputStream.close();
+    }
+
+    /**
+     * 将对象集合转化为excel的InputStream
+     *
+     * @param objects     数据集合
+     * @param type        数据类型
+     * @param columnNames 列名集合
+     * @param columns     要打印的列
+     */
+    public static final <T> InputStream getObjectsExcelInputStream(List<T> objects, Class type,
+                                                                   String[] columnNames, String... columns) throws NoSuchFieldException, IllegalAccessException {
+
+        // 创建excel
+        XSSFWorkbook wb = new XSSFWorkbook();
+        writeXSSWorkbookData(wb, objects, type, columnNames, columns);
+        ByteArrayInputStream in = null;
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            wb.write(os);
+            byte[] b = os.toByteArray();
+            in = new ByteArrayInputStream(b);
+            os.close();
+        } catch (IOException e) {
+            logger.error("ExcelUtils getExcelFile error:{}", e.toString());
+            return null;
+        }
+
+        return in;
+    }
+
+    private static <T> void writeXSSWorkbookData(XSSFWorkbook wb, List<T> objects, Class type, String[] columnNames, String[] columns) throws NoSuchFieldException, IllegalAccessException {
+        // 创建表单
+        XSSFSheet sheet = wb.createSheet("sheet (total " + objects.size() + ")");
+        // 设置文本格式
+        XSSFCellStyle style = wb.createCellStyle();
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setFillForegroundColor(HSSFColor.HSSFColorPredefined.BRIGHT_GREEN.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        // 写入列名
+        XSSFRow row = sheet.createRow(0);
+        XSSFCell cell;
+        for (int i = 0; i < columnNames.length; i++) {
+            sheet.setColumnWidth(i, 20 * 256);
+            cell = row.createCell(i);
+            cell.setCellValue(columnNames[i]);
+            cell.setCellStyle(style);
+        }
+        // 要打印的列
+        List<Field> fieldList = new ArrayList<>();
+        for (String column : columns) {
+            fieldList.add(type.getDeclaredField(column));
+        }
+        // 写入数据
+        for (int i = 0; i < objects.size(); i++) {
+            row = sheet.createRow(i + 1);
+            Object obj = objects.get(i);
+            for (int j = 0; j < fieldList.size(); j++) {
+                Field field = fieldList.get(j);
+                field.setAccessible(true);
+                Object fieldObj = Optional.ofNullable(field.get(obj)).orElse("");
+                if (field.getGenericType().toString().endsWith("Date")) {
+                    row.createCell(j).setCellValue(Strings.isBlank(fieldObj.toString()) ? fieldObj.toString() : format.get().format((Date) fieldObj));
+                } else {
+                    row.createCell(j).setCellValue(fieldObj.toString());
+                }
+            }
+        }
+    }
 }

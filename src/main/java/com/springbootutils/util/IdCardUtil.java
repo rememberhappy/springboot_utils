@@ -224,7 +224,6 @@ public class IdCardUtil {
         if (idCardNo.length() != 18 && idCardNo.length() != 15) {
             throw new Exception("身份证号码长度错误");
         }
-
         Matcher matcher = PATTERN.matcher(idCardNo);
         boolean res = matcher.matches();
         if (!res) {

@@ -120,8 +120,8 @@ public class PhoneFormatCheckUtils {
      * @date 2021/5/15 17:05
      */
     public static boolean checkUserPhone(String phone, String regexMobile) {
-        Pattern p = null;
-        Matcher m = null;
+        Pattern p;
+        Matcher m;
         boolean b = false;
         if (StringUtils.isNotBlank(phone)) {
             p = Pattern.compile(regexMobile);

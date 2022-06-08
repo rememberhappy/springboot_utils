@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class FileDownUtils {
@@ -57,7 +58,7 @@ public class FileDownUtils {
             fileName = URLEncoder.encode(fileName, "UTF-8");
             fileName = fileName.replace("+", "%20"); // 处理空格变“+”的问题
         } else { // 谷歌 火狐 360
-            fileName = new String(fileName.getBytes("UTF-8"), "ISO8859-1");
+            fileName = new String(fileName.getBytes(StandardCharsets.UTF_8), "ISO8859-1");
         }
         return fileName;
     }
