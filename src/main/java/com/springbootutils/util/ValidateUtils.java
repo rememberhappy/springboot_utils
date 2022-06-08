@@ -49,7 +49,7 @@ public class ValidateUtils {
 
 
     /**
-     * 是否是身份证号码
+     * 是否是身份证号码，有问题
      *
      * @param
      * @return
